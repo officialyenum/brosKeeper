@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "144519895129",
+    "firebase_url": "https://broskeeper-27af1.firebaseio.com",
+    "project_id": "broskeeper-27af1",
+    "storage_bucket": "broskeeper-27af1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144519895129:android:adf8567880dd719e8b7948",
+        "android_client_info": {
+          "package_name": "com.example.brosKeeper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "144519895129-ff71nkp8okd2b3nv1nnubeoc880n63ai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOlYgzkCVUPq3H1vze1iQlsskM6FK_vFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "144519895129-ff71nkp8okd2b3nv1nnubeoc880n63ai.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
