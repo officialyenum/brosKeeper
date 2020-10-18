@@ -4,6 +4,7 @@ import 'package:brosKeeper/pages/viewContact.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,7 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference();
-  AssetImage image = AssetImage("assets/images/logo.png");
+  AssetImage profile = AssetImage("assets/images/logo.png");
   String username, email;
   User user;
   bool isSignedIn = false;
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage> {
 
   navigateToViewScreen(id) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ViewContact()));
+        context, MaterialPageRoute(builder: (context) => ViewContact(id: id)));
     // Navigator.of(context).pushNamed('/AddContactPage', arguments: null);
   }
 
@@ -78,79 +79,109 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: navigateToAddScreen,
-      ),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: new AppBar(
-        title: new Text(
-          "Bro's Keeper",
-          style: Theme.of(context)
-              .textTheme
-              .headline5
-              .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: navigateToAddScreen,
         ),
-        elevation: 0.0,
-        centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor,
-        leading: new IconButton(
-          icon: new Icon(Icons.logout,
-              color: Theme.of(context).textSelectionColor),
-          onPressed: signOut,
-        ),
-        actions: [
-          InkWell(
-            child: Container(
-              margin: EdgeInsets.fromLTRB(0.0, 12.0, 16.0, 12.0),
-              height: 30.0,
-              width: 30.0,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: image,
-                  )),
-            ),
-            onTap: () {
-              Navigator.of(context)
-                  .pushReplacementNamed('/Profile', arguments: 4);
-            },
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: new AppBar(
+          title: new Text(
+            "Bro's Keeper",
+            style: Theme.of(context)
+                .textTheme
+                .headline5
+                .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
-      body: Container(
-          child: Center(
-        child: !isSignedIn
-            ? CircularProgressIndicator()
-            : Column(
-                children: [
-                  Container(
-                      padding: EdgeInsets.all(50),
-                      child: Image(
-                        image: image,
-                        width: 100.0,
-                        height: 100.0,
-                      )),
-                  Container(
-                      padding: EdgeInsets.all(50),
-                      child: Text('Hello ${user.email}')),
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    child: RaisedButton(
-                      padding: EdgeInsets.fromLTRB(100, 20, 100, 20),
-                      onPressed: signOut,
-                      color: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      child: Text("Sign Out",
-                          style: Theme.of(context).textTheme.subtitle1),
-                    ),
-                  ),
-                ],
+          elevation: 0.0,
+          centerTitle: true,
+          backgroundColor: Theme.of(context).primaryColor,
+          leading: new IconButton(
+            icon: new Icon(Icons.logout,
+                color: Theme.of(context).textSelectionColor),
+            onPressed: signOut,
+          ),
+          actions: [
+            InkWell(
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0.0, 12.0, 16.0, 12.0),
+                height: 30.0,
+                width: 30.0,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: profile,
+                    )),
               ),
-      )),
-    );
+              onTap: () {
+                Navigator.of(context)
+                    .pushReplacementNamed('/Profile', arguments: 4);
+              },
+            ),
+          ],
+        ),
+        body: Container(
+            child: Center(
+          child: !isSignedIn
+              ? CircularProgressIndicator()
+              : Container(
+                  child: FirebaseAnimatedList(
+                  query: _databaseReference,
+                  itemBuilder: (context, snapshot, animation, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        navigateToViewScreen(snapshot.key);
+                      },
+                      child: Card(
+                        color: Theme.of(context).cardColor,
+                        elevation: 2.0,
+                        child: Container(
+                          margin: EdgeInsets.all(2.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 50.0,
+                                height: 50.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: snapshot.value["photoUrl"] == "empty"
+                                      ? DecorationImage(image: profile)
+                                      : DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: NetworkImage(
+                                              snapshot.value["photoUrl"])),
+                                ),
+                              ),
+                              Container(
+                                  margin: EdgeInsets.all(20.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                          '${snapshot.value['firstName']} ${snapshot.value['lastName']}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .subtitle1),
+                                      SizedBox(height: 5),
+                                      Text('@${snapshot.value['twitter']}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .subtitle1),
+                                      SizedBox(height: 5),
+                                      Text('${snapshot.value['phone']}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .subtitle1),
+                                    ],
+                                  )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )),
+        )));
   }
 }

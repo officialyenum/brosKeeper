@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class EditContact extends StatefulWidget {
+  final String id;
+
+  EditContact({this.id});
   @override
   _EditContactState createState() => _EditContactState();
 }
